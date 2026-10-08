@@ -89,7 +89,7 @@ public sealed class TicketModule : ICarterModule
 
             ticket.Title = request.Title;
             ticket.Description = request.Description;
-            ticket.UpdateAt = DateTimeOffset.UtcNow;
+            ticket.UpdatedAt = DateTimeOffset.UtcNow;
 
             await dbContext.SaveChangesAsync(cancellationToken);
 
@@ -124,7 +124,7 @@ public sealed class TicketModule : ICarterModule
             }
 
             ticket.Status = TicketStatus.Closed;
-            ticket.UpdateAt = DateTimeOffset.UtcNow;
+            ticket.UpdatedAt = DateTimeOffset.UtcNow;
 
             await dbContext.SaveChangesAsync(cancellationToken);
 

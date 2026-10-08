@@ -141,7 +141,7 @@ public sealed class UserModule : ICarterModule
 
             user.Name = request.Name;
             user.Email = request.Email;
-            user.UpdateAt = DateTimeOffset.UtcNow;
+            user.UpdatedAt = DateTimeOffset.UtcNow;
 
             await dbContext.SaveChangesAsync(cancellationToken);
 
