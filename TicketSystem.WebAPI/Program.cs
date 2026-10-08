@@ -1,27 +1,91 @@
+using Carter;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Scalar.AspNetCore;
+using System.Threading.RateLimiting;
 using TicketSystem.WebAPI.Context;
 using TicketSystem.WebAPI.Mappings;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Database Configuration
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+{
+    string con = builder.Configuration.GetConnectionString("SqlServer")!;
+    options.UseSqlServer(con);
+});
+
+
+// Carter
+builder.Services.AddCarter();
+
+
+// OpenAPI
+builder.Services.AddOpenApi();
+
+
+// CORS
+builder.Services.AddCors();
+
+// Mapster
 MapsterConfig.RegisterMappings();
 
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("SqlServer")));
+
+// CORS
+builder.Services.AddCors();
+
+
+// Rate Limiting
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter("fixed", o =>
+    {
+        o.PermitLimit = 100;
+        o.Window = TimeSpan.FromSeconds(1);
+        o.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        o.QueueLimit = 100;
+    });
+});
+
 
 
 
 
 var app = builder.Build();
 
+// OpenAPI & Scalar
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+
+    app.MapScalarApiReference();
+}
+
+// HTTPS Redirection
+app.UseHttpsRedirection();
+
+// Static Files
+app.UseStaticFiles();
+
+// CORS
+app.UseCors(x => x
+    .AllowAnyOrigin()
+    .AllowAnyHeader()
+    .AllowAnyMethod()
+    .SetPreflightMaxAge(TimeSpan.FromSeconds(10))
+);
+
+// Response Compression
+app.UseResponseCompression();
+
+// Rate Limiting
+app.UseRateLimiter();
 
 
-
-app.MapGet("/", () => "Hello World!");
-
+// Carter
+app.MapCarter();
 
 
 app.Run();
