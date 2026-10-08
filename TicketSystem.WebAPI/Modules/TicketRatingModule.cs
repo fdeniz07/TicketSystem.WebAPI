@@ -14,7 +14,8 @@ public sealed class TicketRatingModule : ICarterModule
     {
         var app = group
             .MapGroup("/tickets/{ticketId:guid}/rating")
-            .WithTags("Ticket Rating");
+            .WithTags("Ticket Rating")
+            .RequireRateLimiting("fixed");
 
 
         ///////////// POST /tickets/{ticketId}/rating   \\\\\\\\\\\\\\\\

@@ -14,7 +14,8 @@ public sealed class TicketReplyModule : ICarterModule
     {
         var app = group
             .MapGroup("/tickets/{ticketId:guid}/replies")
-            .WithTags("Ticket Replies");
+            .WithTags("Ticket Replies")
+            .RequireRateLimiting("fixed");
 
 
         ///////////// POST /tickets/{ticketId}/replies   \\\\\\\\\\\\\\\\

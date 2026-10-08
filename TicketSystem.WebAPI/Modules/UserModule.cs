@@ -15,7 +15,8 @@ public sealed class UserModule : ICarterModule
     {
         var app = group
             .MapGroup("/users")
-            .WithTags("Users");
+            .WithTags("Users")
+            .RequireRateLimiting("fixed"); 
 
 
         ///////////// POST /users   \\\\\\\\\\\\\\\\
