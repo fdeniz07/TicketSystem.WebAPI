@@ -2,7 +2,6 @@
 using TicketSystem.WebAPI.Abstractions;
 using TicketSystem.WebAPI.DTOs.Ticket;
 using TicketSystem.WebAPI.DTOs.TicketRating;
-using TicketSystem.WebAPI.DTOs.TicketRating.TicketSystem.WebAPI.DTOs.TicketRating;
 using TicketSystem.WebAPI.DTOs.TicketReply;
 using TicketSystem.WebAPI.DTOs.User;
 using TicketSystem.WebAPI.Models;
@@ -32,12 +31,21 @@ public static class MapsterConfig
             .Map(
                 dest => dest.CreatedByUserName,
                 src => src.CreatedByUser.Name);
+       
+        TypeAdapterConfig<Ticket, TicketDetailResponseDto>.NewConfig()
+            .Map(
+                dest => dest.Status,
+                src => src.Status.Value);
 
         TypeAdapterConfig<TicketReplyCreateDto, TicketReply>.NewConfig();
 
         TypeAdapterConfig<TicketRatingCreateDto, TicketRating>.NewConfig();
 
         TypeAdapterConfig<TicketRating, TicketRatingResponseDto>.NewConfig()
+            .Map(
+                dest => dest.UserName,
+                src => src.User.Name);
+        TypeAdapterConfig<TicketReply, TicketReplyResponseDto>.NewConfig()
             .Map(
                 dest => dest.UserName,
                 src => src.User.Name);

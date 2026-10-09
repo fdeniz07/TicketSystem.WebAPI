@@ -69,6 +69,13 @@ public sealed class TicketRatingModule : ICarterModule
                 return Results.Ok(errorResponse);
             }
 
+            if (ticket.Status != TicketStatus.Closed)
+            {
+                var errorResponse = Result<object>.Failure(400, "Ticket kapatılmadan değerlendirme yapılamaz.");
+
+                return Results.Ok(errorResponse);
+            }
+
             var rating = request.Adapt<TicketRating>();
 
             rating.TicketId = ticketId;

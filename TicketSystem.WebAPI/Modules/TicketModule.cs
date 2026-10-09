@@ -64,6 +64,54 @@ public sealed class TicketModule : ICarterModule
         }).Produces<Result<List<TicketResponseDto>>>();
 
 
+        ///////////// GET /tickets/{id}   \\\\\\\\\\\\\\\\
+        app.MapGet("/{id:guid}", async (
+            Guid id,
+            ApplicationDbContext dbContext,
+            CancellationToken cancellationToken) =>
+        {
+            var ticket = await dbContext.Tickets
+                .AsNoTracking()
+                .Include(x => x.CreatedByUser)
+                .Include(x => x.Replies)
+                    .ThenInclude(x => x.User)
+                .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+
+            if (ticket is null)
+            {
+                var errorResponse = Result<object>.Failure(404, "Ticket bulunamadı.");
+
+                return Results.Ok(errorResponse);
+            }
+
+            var messages = ticket.Replies
+                .Select(x => new TicketMessageResponseDto(
+                    x.UserId,
+                    x.User.Name,
+                    x.Message,
+                    x.CreatedAt))
+                .Append(new TicketMessageResponseDto(
+                    ticket.CreatedByUserId,
+                    ticket.CreatedByUser.Name,
+                    ticket.Description,
+                    ticket.CreatedAt))
+                .OrderBy(x => x.CreatedAt)
+                .ToList();
+
+            var response = new TicketDetailResponseDto(
+                ticket.Id,
+                ticket.Title,
+                ticket.Description,
+                ticket.Status.Value,
+                ticket.CreatedAt,
+                messages);
+
+            return Results.Ok(
+                Result<TicketDetailResponseDto>.Succeed(response));
+
+        }).Produces<Result<TicketDetailResponseDto>>();
+
+
         ///////////// PUT /tickets/{id}   \\\\\\\\\\\\\\\\
         app.MapPut("/{id:guid}", async (
             Guid id,

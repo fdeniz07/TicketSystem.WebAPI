@@ -80,9 +80,7 @@ public sealed class TicketReplyModule : ICarterModule
             CancellationToken cancellationToken) =>
         {
             var ticketExists = await dbContext.Tickets
-                .AnyAsync(
-                    x => x.Id == ticketId,
-                    cancellationToken);
+                .AnyAsync(x => x.Id == ticketId, cancellationToken);
 
             if (!ticketExists)
             {
@@ -98,10 +96,10 @@ public sealed class TicketReplyModule : ICarterModule
                 .OrderBy(x => x.CreatedAt)
                 .ToListAsync(cancellationToken);
 
-            var response = replies.Adapt<List<TicketReply>>();
+            var response = replies.Adapt<List<TicketReplyResponseDto>>();
 
-            return Results.Ok(Result<List<TicketReply>>.Succeed(response));
+            return Results.Ok(Result<List<TicketReplyResponseDto>>.Succeed(response));
 
-        }).Produces<Result<List<TicketReply>>>();
+        }).Produces<Result<List<TicketReplyResponseDto>>>();
     }
 }
